@@ -1,0 +1,240 @@
+]
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login | Food Order</title>
+
+    <!-- Main Project CSS -->
+    <link rel="stylesheet" href="style.css" />
+
+    <style>
+        /* Extra styles only for login page */
+        body {
+            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('img/food-bg.jpg');
+            background-size: cover;
+            background-position: center;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .login-container {
+            background: #fff;
+            width: 100%;
+            max-width: 420px;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .login-container .logo {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .login-container .logo img {
+            width: 120px;
+        }
+
+        .login-container h2 {
+            text-align: center;
+            margin-bottom: 5px;
+            color: #1e3c72;
+        }
+
+        .login-container p {
+            text-align: center;
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 25px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            margin-bottom: 6px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            font-size: 14px;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #1e3c72;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 12px;
+            background: #1e3c72;
+            border: none;
+            color: #fff;
+            font-size: 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .login-btn:hover {
+            background: #1e3c72;
+        }
+
+        .links {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 14px;
+        }
+
+        .links a {
+            color: #1e3c72;
+            text-decoration: none;
+            margin: 0 5px;
+        }
+
+        .links a:hover {
+            text-decoration: underline;
+        }
+
+        .error {
+            color: #1e3c72;
+            font-size: 13px;
+            text-align: center;
+            margin-top: 10px;
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="login-container">
+    <div class="logo">
+        <img src="logo.png" alt="Food Order Logo" />
+    </div>
+
+    <h2>Welcome Back</h2>
+    <p id="formDesc">Login to order your favourite food</p>
+
+    <form id="loginForm">
+        <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="email" placeholder="Enter your email" required />
+        </div>
+
+        <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="password" placeholder="Enter your password" required />
+        </div>
+
+        <!-- Confirm password field (hidden by default) -->
+        <div class="form-group" id="confirmPasswordDiv" style="display:none;">
+            <label>Confirm Password</label>
+            <input type="password" id="confirmPassword" placeholder="Confirm your password" />
+        </div>
+
+        <button type="submit" class="login-btn" id="submitBtn">Login</button>
+        <div class="error" id="errorMsg">Invalid email or password</div>
+    </form>
+
+    <div class="links">
+        <a href="#" id="forgotPasswordLink">Forgot Password?</a> |
+        <a href="#" id="toggleForm">Create Account</a>
+    </div>
+</div>
+
+<script>
+    const form = document.getElementById('loginForm');
+    const errorMsg = document.getElementById('errorMsg');
+    const toggleForm = document.getElementById('toggleForm');
+    const confirmPasswordDiv = document.getElementById('confirmPasswordDiv');
+    const submitBtn = document.getElementById('submitBtn');
+    const formDesc = document.getElementById('formDesc');
+
+    let isCreatingAccount = false;
+
+    toggleForm.addEventListener('click', function(e) {
+        e.preventDefault();
+        isCreatingAccount = !isCreatingAccount;
+
+        if (isCreatingAccount) {
+            confirmPasswordDiv.style.display = 'block';
+            submitBtn.textContent = 'Create Account';
+            formDesc.textContent = 'Enter your details to create an account';
+            toggleForm.textContent = 'Back to Login';
+        } else {
+            confirmPasswordDiv.style.display = 'none';
+            submitBtn.textContent = 'Login';
+            formDesc.textContent = 'Login to order your favourite food';
+            toggleForm.textContent = 'Create Account';
+        }
+
+        errorMsg.style.display = 'none';
+    });
+
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const email = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value.trim();
+        const confirmPassword = document.getElementById('confirmPassword').value.trim();
+
+        if (isCreatingAccount) {
+            // Create account flow
+            if (!email || !password || !confirmPassword) {
+                alert('Please fill all fields');
+                return;
+            }
+
+            if (password !== confirmPassword) {
+                alert('Passwords do not match');
+                return;
+            }
+
+            // Save account in localStorage
+            let accounts = JSON.parse(localStorage.getItem('accounts') || '{}');
+
+            if (accounts[email]) {
+                alert('Account already exists');
+                return;
+            }
+
+            accounts[email] = password;
+            localStorage.setItem('accounts', JSON.stringify(accounts));
+            alert('Account successfully created!');
+
+            // Switch back to login form
+            isCreatingAccount = false;
+            confirmPasswordDiv.style.display = 'none';
+            submitBtn.textContent = 'Login';
+            formDesc.textContent = 'Login to order your favourite food';
+            toggleForm.textContent = 'Create Account';
+            form.reset();
+
+        } else {
+            // Login flow
+            let accounts = JSON.parse(localStorage.getItem('accounts') || '{}');
+
+            if ((email === 'user@gmail.com' && password === '123456') || accounts[email] === password) {
+                alert('Login Successful');
+                window.location.href = 'index.html';
+            } else {
+                errorMsg.style.display = 'block';
+            }
+        }
+    });
+</script>
+
+</body>
+</html>
